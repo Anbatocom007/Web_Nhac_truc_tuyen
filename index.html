@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyMusic</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="loader">
+    <h1>MyMusic</h1>
+</div>
+
+<div class="container">
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo">
+            <h2>MyMusic</h2>
+        </div>
+
+        <ul class="menu">
+            <li onclick="goHome()"> <i class="fa-solid fa-house"></i> <span>Home</span> </li>
+            <li onclick="showLibrary()"> <i class="fa-solid fa-book"></i> <span>Your Library</span> </li>
+            <li onclick="showGenres()"> <i class="fa-solid fa-layer-group"></i> <span>Chủ đề & Thể loại</span> </li>
+            <li onclick="showTop10()"> <i class="fa-solid fa-heart"></i> <span>Top 10 nghe nhiều nhất</span> </li>
+            <li onclick="openRecent()"> <i class="fa-solid fa-clock-rotate-left"></i> <span>Nghe gần đây</span> </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <div class="header">
+            <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="search" placeholder="Tìm kiếm bài hát, nghệ sĩ, lời bài hát...">
+            </div>
+
+            <div class="user-buttons">
+                <button class="signup-btn" onclick="openAuth('signup')">Sign up</button>
+                <button class="login-btn" onclick="openAuth('login')">Log in</button>
+            </div>
+        </div>
+
+        <!-- Top banner -->
+        <div class="top-banner">
+            <h1>Trending Music</h1>
+            <p>Listen to your favorite songs</p>
+        </div>
+
+        <!-- Song lists -->
+        <h1>Trending Music</h1>
+        <div class="song-list" id="trending-list"></div>
+
+        <h1>Recommended For You</h1>
+        <div class="song-list" id="recommend-list"></div>
+
+        <h1>Chill Vibes</h1>
+        <div class="song-list" id="chill-list"></div>
+
+        <h1>Vietnamese Hits</h1>
+        <div class="song-list" id="hits-list"></div>
+
+        <!-- Recent page -->
+        <div id="recent-page" style="display:none"></div>
+
+        <!-- Top10 page -->
+        <div id="top10-page" style="display:none"></div>
+
+        <!-- Genre page -->
+        <div id="genre-page" style="display:none"></div>
+
+        <!-- Library page -->
+        <div id="library-page" style="display:none"></div>
+    </div>
+
+</div>
+
+<!-- Music Player -->
+<div class="music-player">
+    <div class="player-info">
+        <img id="player-image" src="images/song1.jpg">
+        <div>
+            <h4 id="player-title">No song</h4>
+            <p id="player-artist">Unknown artist</p>
+        </div>
+    </div>
+
+    <div class="player-controls">
+        <div class="controls-buttons">
+            <button onclick="toggleShuffle()"> <i class="fa-solid fa-shuffle"></i> </button>
+            <button onclick="prevSong()"> <i class="fa-solid fa-backward-step"></i> </button>
+            <button onclick="togglePlay()"> <i class="fa-solid fa-play"></i> </button>
+            <button onclick="nextSong()"> <i class="fa-solid fa-forward-step"></i> </button>
+            <button onclick="toggleRepeat()"> <i class="fa-solid fa-repeat"></i> </button>
+        </div>
+        <div class="controls-progress">
+            <input type="range" id="progress">
+            <span id="time">0:00</span>
+        </div>
+    </div>
+
+    <div class="volume-box">
+        <button class="download-btn" id="download-btn">
+            <i class="fa-solid fa-arrow-down"></i>
+            <span class="download-tooltip">Tải nhạc về thiết bị</span>
+        </button>
+        <button id="mute-btn" onclick="toggleMute()">
+            <i class="fa-solid fa-volume-high"></i>
+        </button>
+        <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
+    </div>
+</div>
+
+<audio id="audio-player"></audio>
+
+<!-- Auth Popup -->
+<div id="auth-popup" onclick="handleAuthOverlayClick(event)">
+    <div class="auth-box">
+        <button id="close-auth" onclick="closeAuth()">✕</button>
+
+        <!-- Logo -->
+        <div class="auth-logo">
+            <i class="fa-solid fa-music"></i>
+            <span>MyMusic</span>
+        </div>
+
+        <h2 id="auth-title">Đăng nhập</h2>
+        <p class="auth-subtitle" id="auth-subtitle">Chào mừng trở lại!</p>
+
+        <!-- Form -->
+        <div class="auth-form">
+            <div class="auth-field" id="field-name" style="display:none">
+                <label>Họ và tên</label>
+                <div class="auth-input-wrap">
+                    <i class="fa-solid fa-user"></i>
+                    <input id="fullname" type="text" placeholder="Nhập họ và tên">
+                </div>
+            </div>
+
+            <div class="auth-field">
+                <label>Email</label>
+                <div class="auth-input-wrap">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input id="email" type="email" placeholder="Nhập email của bạn">
+                </div>
+            </div>
+
+            <div class="auth-field">
+                <label>Mật khẩu</label>
+                <div class="auth-input-wrap">
+                    <i class="fa-solid fa-lock"></i>
+                    <input id="password" type="password" placeholder="Nhập mật khẩu">
+                    <button class="toggle-pw" onclick="togglePassword()" type="button">
+                        <i class="fa-solid fa-eye" id="pw-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="auth-field" id="field-confirm" style="display:none">
+                <label>Xác nhận mật khẩu</label>
+                <div class="auth-input-wrap">
+                    <i class="fa-solid fa-lock"></i>
+                    <input id="confirm-password" type="password" placeholder="Nhập lại mật khẩu">
+                </div>
+            </div>
+
+            <div class="auth-forgot" id="auth-forgot">
+                <a href="#" onclick="return false">Quên mật khẩu?</a>
+            </div>
+
+            <button class="auth-submit" onclick="submitAuth()">
+                <span id="auth-btn-text">Đăng nhập</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+
+            <div class="auth-divider"><span>hoặc</span></div>
+
+            <div class="auth-social">
+                <button class="social-btn google">
+                    <i class="fa-brands fa-google"></i> Google
+                </button>
+                <button class="social-btn facebook">
+                    <i class="fa-brands fa-facebook"></i> Facebook
+                </button>
+            </div>
+        </div>
+
+        <p class="auth-switch" id="auth-switch">
+            Chưa có tài khoản?
+            <a href="#" onclick="openAuth('signup'); return false">Đăng ký ngay</a>
+        </p>
+    </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
